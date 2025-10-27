@@ -1,872 +1,1301 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Greenhouse - Visualisasi Diagram</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        min-height: 100vh;
-      }
-
-      .container {
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      header {
-        text-align: center;
-        color: white;
-        margin-bottom: 30px;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      }
-
-      header h1 {
-        font-size: 2.5em;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      header p {
-        font-size: 1.2em;
-        opacity: 0.9;
-      }
-
-      .tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-
-      .tab-btn {
-        padding: 15px 30px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1em;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-      }
-
-      .tab-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      .tab-btn.active {
-        background: white;
-        color: #667eea;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      .diagram-container {
-        background: white;
-        border-radius: 15px;
-        padding: 40px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        display: none;
-        animation: fadeIn 0.5s ease;
-      }
-
-      .diagram-container.active {
-        display: block;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
         }
-      }
-
-      .diagram-title {
-        font-size: 2em;
-        color: #667eea;
-        margin-bottom: 20px;
-        text-align: center;
-        font-weight: bold;
-      }
-
-      .diagram-description {
-        color: #666;
-        margin-bottom: 30px;
-        line-height: 1.6;
-        text-align: center;
-        font-size: 1.1em;
-      }
-
-      /* Block Diagram Styles */
-      .block-diagram {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        align-items: center;
-      }
-
-      .block-row {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .block {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 25px 35px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        min-width: 200px;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .block:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-      }
-
-      .block h3 {
-        font-size: 1.3em;
-        margin-bottom: 10px;
-      }
-
-      .block ul {
-        list-style: none;
-        font-size: 0.9em;
-        line-height: 1.8;
-      }
-
-      .block.controller {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        min-width: 250px;
-      }
-
-      .block.platform {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      }
-
-      .arrow-down {
-        width: 0;
-        height: 0;
-        border-left: 20px solid transparent;
-        border-right: 20px solid transparent;
-        border-top: 30px solid #667eea;
-        margin: 0 auto;
-        opacity: 0.6;
-      }
-
-      /* Flowchart Styles */
-      .flowchart {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-
-      .flow-node {
-        background: white;
-        border: 3px solid #667eea;
-        padding: 20px 30px;
-        border-radius: 10px;
-        min-width: 250px;
-        text-align: center;
-        font-weight: bold;
-        color: #333;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-      }
-
-      .flow-node:hover {
-        transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-      }
-
-      .flow-node.start-end {
-        background: #667eea;
-        color: white;
-        border-radius: 50px;
-      }
-
-      .flow-node.decision {
-        background: #fff5e6;
-        border-color: #ff9800;
-        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-        padding: 30px 40px;
-        min-width: 280px;
-      }
-
-      .flow-node.process {
-        background: #e3f2fd;
-        border-color: #2196f3;
-      }
-
-      .flow-node.action {
-        background: #e8f5e9;
-        border-color: #4caf50;
-      }
-
-      .flow-branches {
-        display: flex;
-        gap: 40px;
-        justify-content: center;
-      }
-
-      .flow-branch {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .branch-label {
-        background: #ff9800;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 0.9em;
-      }
-
-      .flow-connector {
-        width: 3px;
-        height: 25px;
-        background: #667eea;
-        margin: 0 auto;
-      }
-
-      /* Use Case Diagram */
-      .usecase-diagram {
-        display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
-        gap: 30px;
-        align-items: center;
-        margin-top: 30px;
-      }
-
-      .actor {
-        text-align: center;
-      }
-
-      .actor-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        margin: 0 auto 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2.5em;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-      }
-
-      .actor-name {
-        font-weight: bold;
-        color: #333;
-        font-size: 1.2em;
-      }
-
-      .use-cases {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .use-case {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border: 2px solid #2196f3;
-        padding: 15px 25px;
-        border-radius: 30px;
-        text-align: center;
-        font-weight: 500;
-        color: #1976d2;
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
-
-      .use-case:hover {
-        transform: translateX(10px);
-        box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
-        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-        color: white;
-      }
-
-      /* Architecture Diagram */
-      .architecture {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-      }
-
-      .tier {
-        background: white;
-        border: 3px solid #667eea;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .tier-title {
-        font-size: 1.5em;
-        color: #667eea;
-        font-weight: bold;
-        margin-bottom: 15px;
-        text-align: center;
-      }
-
-      .tier-content {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .tier-component {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        min-width: 180px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      }
-
-      .tier-component h4 {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-      }
-
-      .tier-component ul {
-        list-style: none;
-        font-size: 0.85em;
-        line-height: 1.6;
-      }
-
-      .tier-connector {
-        text-align: center;
-        color: #667eea;
-        font-size: 2em;
-        font-weight: bold;
-      }
-
-      /* Hardware Connection Diagram */
-      .hardware-diagram {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 30px;
-        align-items: center;
-        margin-top: 30px;
-      }
-
-      .hardware-column {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .hardware-item {
-        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-        padding: 15px 20px;
-        border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        font-weight: 500;
-        color: #333;
-        transition: all 0.3s ease;
-      }
-
-      .hardware-item:hover {
-        transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(132, 250, 176, 0.3);
-      }
-
-      .esp32-center {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        padding: 40px 30px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);
-        min-width: 200px;
-      }
-
-      .esp32-center h3 {
-        font-size: 1.5em;
-        margin-bottom: 10px;
-      }
-
-      .connection-line {
-        width: 50px;
-        height: 3px;
-        background: #667eea;
-      }
-
-      @media (max-width: 768px) {
-        .usecase-diagram,
-        .hardware-diagram {
-          grid-template-columns: 1fr;
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
-
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
         header h1 {
-          font-size: 1.8em;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
         .tab-btn {
-          padding: 12px 20px;
-          font-size: 0.9em;
-        }
-
-        .diagram-container {
-          padding: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>🌱 Smart Greenhouse IoT System</h1>
-        <p>Visualisasi Diagram & Flowchart Sistem</p>
-      </header>
-
-      <div class="tabs">
-        <button class="tab-btn active" onclick="showDiagram('block')">
-          Diagram Blok
-        </button>
-        <button class="tab-btn" onclick="showDiagram('flowchart')">
-          Flowchart
-        </button>
-        <button class="tab-btn" onclick="showDiagram('usecase')">
-          Use Case
-        </button>
-        <button class="tab-btn" onclick="showDiagram('architecture')">
-          Arsitektur
-        </button>
-        <button class="tab-btn" onclick="showDiagram('hardware')">
-          Koneksi Hardware
-        </button>
-      </div>
-
-      <!-- Block Diagram -->
-      <div id="block" class="diagram-container active">
-        <h2 class="diagram-title">📊 Diagram Blok Sistem</h2>
-        <p class="diagram-description">
-          Diagram blok menunjukkan komponen utama sistem Smart Greenhouse dan
-          hubungan antar komponen
-        </p>
-
-        <div class="block-diagram">
-          <div class="block-row">
-            <div class="block">
-              <h3>📡 SENSORS</h3>
-              <ul>
-                <li>• DHT22 (Suhu & Kelembaban)</li>
-                <li>• Soil Moisture Sensor</li>
-                <li>• LDR (Light Sensor)</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="arrow-down"></div>
-
-          <div class="block-row">
-            <div class="block controller">
-              <h3>🎛️ MICROCONTROLLER</h3>
-              <ul>
-                <li>ESP32 DevKit</li>
-                <li>• Data Processing</li>
-                <li>• Control Logic</li>
-                <li>• Wi-Fi Communication</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="arrow-down"></div>
-
-          <div class="block-row">
-            <div class="block platform">
-              <h3>☁️ IoT PLATFORM</h3>
-              <ul>
-                <li>Blynk / ThingSpeak</li>
-                <li>• MQTT Broker</li>
-                <li>• Cloud Database</li>
-                <li>• Real-time Dashboard</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="arrow-down"></div>
-
-          <div class="block-row">
-            <div class="block">
-              <h3>💧 ACTUATORS</h3>
-              <ul>
-                <li>• Water Pump</li>
-                <li>• Relay Module</li>
-                <li>• Notification System</li>
-              </ul>
-            </div>
-            <div class="block">
-              <h3>📱 USER INTERFACE</h3>
-              <ul>
-                <li>• Mobile App</li>
-                <li>• Web Dashboard</li>
-                <li>• Manual Control</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Flowchart -->
-      <div id="flowchart" class="diagram-container">
-        <h2 class="diagram-title">🔄 Flowchart Sistem Irigasi Otomatis</h2>
-        <p class="diagram-description">
-          Alur kerja sistem dalam memproses data sensor dan mengontrol irigasi
-        </p>
-
-        <div class="flowchart">
-          <div class="flow-node start-end">START</div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node process">
-            Inisialisasi Sistem<br />
-            <small>Wi-Fi, Sensors, MQTT</small>
-          </div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node process">
-            Baca Data Sensor<br />
-            <small>Suhu, Kelembaban, Soil Moisture</small>
-          </div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node process">
-            Kirim Data ke Cloud<br />
-            <small>via MQTT/HTTP</small>
-          </div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node decision">Kelembaban Tanah<br />< 40% ?</div>
-
-          <div class="flow-branches">
-            <div class="flow-branch">
-              <span class="branch-label">YA</span>
-              <div class="flow-node action">
-                Aktifkan Pompa Air<br />
-                <small>Status: Menyiram</small>
-              </div>
-            </div>
-
-            <div class="flow-branch">
-              <span class="branch-label">TIDAK</span>
-              <div class="flow-node decision">Kelembaban > 60% ?</div>
-              <div class="flow-branches" style="margin-top: 15px">
-                <div class="flow-branch">
-                  <span class="branch-label" style="background: #4caf50"
-                    >YA</span
-                  >
-                  <div class="flow-node action">
-                    Matikan Pompa<br />
-                    <small>Status: Normal</small>
-                  </div>
-                </div>
-                <div class="flow-branch">
-                  <span class="branch-label" style="background: #9e9e9e"
-                    >TIDAK</span
-                  >
-                  <div class="flow-node process">Pertahankan Status</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flow-connector" style="height: 50px"></div>
-
-          <div class="flow-node process">Update Dashboard & Notifikasi</div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node process">Delay 5 Detik</div>
-          <div class="flow-connector"></div>
-
-          <div class="flow-node start-end">LOOP KEMBALI</div>
-        </div>
-      </div>
-
-      <!-- Use Case Diagram -->
-      <div id="usecase" class="diagram-container">
-        <h2 class="diagram-title">👥 Use Case Diagram</h2>
-        <p class="diagram-description">
-          Interaksi antara pengguna (Petani) dan sistem Smart Greenhouse
-        </p>
-
-        <div class="usecase-diagram">
-          <div class="actor">
-            <div class="actor-icon">👨‍🌾</div>
-            <div class="actor-name">PETANI<br />(User)</div>
-          </div>
-
-          <div class="use-cases">
-            <div class="use-case">📊 View Real-time Sensor Data</div>
-            <div class="use-case">🌡️ Monitor Temperature & Humidity</div>
-            <div class="use-case">💧 Check Soil Moisture Level</div>
-            <div class="use-case">🎮 Control Irrigation Manually</div>
-            <div class="use-case">⚙️ Set Threshold Values</div>
-            <div class="use-case">📈 View Historical Data</div>
-            <div class="use-case">🔔 Receive Alert Notifications</div>
-            <div class="use-case">📥 Export Data (CSV/Excel)</div>
-            <div class="use-case">🔧 Configure System Settings</div>
-          </div>
-
-          <div class="actor">
-            <div class="actor-icon">🤖</div>
-            <div class="actor-name">SISTEM<br />(Automated)</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Architecture Diagram -->
-      <div id="architecture" class="diagram-container">
-        <h2 class="diagram-title">🏗️ Arsitektur Sistem 3-Tier</h2>
-        <p class="diagram-description">
-          Arsitektur sistem terdiri dari 3 layer: Presentation, Application, dan
-          Data Tier
-        </p>
-
-        <div class="architecture">
-          <div class="tier">
-            <div class="tier-title">📱 PRESENTATION TIER (User Interface)</div>
-            <div class="tier-content">
-              <div class="tier-component">
-                <h4>Mobile App</h4>
-                <ul>
-                  <li>• Real-time data</li>
-                  <li>• Quick control</li>
-                  <li>• Push notifications</li>
-                </ul>
-              </div>
-              <div class="tier-component">
-                <h4>Web Dashboard</h4>
-                <ul>
-                  <li>• Data analytics</li>
-                  <li>• Export reports</li>
-                  <li>• Configuration</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="tier-connector">⬇️</div>
-
-          <div class="tier">
-            <div class="tier-title">☁️ APPLICATION TIER (Business Logic)</div>
-            <div class="tier-content">
-              <div class="tier-component">
-                <h4>IoT Cloud Platform</h4>
-                <ul>
-                  <li>• Data processing</li>
-                  <li>• Business rules</li>
-                  <li>• Alert management</li>
-                  <li>• Authentication</li>
-                </ul>
-              </div>
-              <div class="tier-component">
-                <h4>MQTT Broker</h4>
-                <ul>
-                  <li>• Message queue</li>
-                  <li>• Pub/Sub protocol</li>
-                  <li>• QoS management</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="tier-connector">⬇️</div>
-
-          <div class="tier">
-            <div class="tier-title">🔌 DATA TIER (IoT Devices)</div>
-            <div class="tier-content">
-              <div class="tier-component">
-                <h4>ESP32 Controller</h4>
-                <ul>
-                  <li>• Sensor data collection</li>
-                  <li>• Local control logic</li>
-                  <li>• Actuator management</li>
-                  <li>• Data buffering</li>
-                </ul>
-              </div>
-              <div class="tier-component">
-                <h4>Sensors</h4>
-                <ul>
-                  <li>• DHT22</li>
-                  <li>• Soil Moisture</li>
-                  <li>• LDR Light</li>
-                </ul>
-              </div>
-              <div class="tier-component">
-                <h4>Actuators</h4>
-                <ul>
-                  <li>• Water Pump</li>
-                  <li>• Relay Module</li>
-                  <li>• LED Indicators</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hardware Connection Diagram -->
-      <div id="hardware" class="diagram-container">
-        <h2 class="diagram-title">🔌 Diagram Koneksi Hardware</h2>
-        <p class="diagram-description">
-          Koneksi detail antara sensor, ESP32, dan aktuator dalam sistem Smart
-          Greenhouse
-        </p>
-
-        <div class="hardware-diagram">
-          <div class="hardware-column">
-            <h3 style="color: #667eea; text-align: center; margin-bottom: 15px">
-              INPUT SENSORS
-            </h3>
-            <div class="hardware-item">
-              📡 DHT22<br />
-              <small>GPIO 4 → Temp & Humidity</small>
-            </div>
-            <div class="hardware-item">
-              💧 Soil Moisture Sensor<br />
-              <small>ADC 34 → Analog Input</small>
-            </div>
-            <div class="hardware-item">
-              💡 LDR Light Sensor<br />
-              <small>ADC 35 → Light Intensity</small>
-            </div>
-            <div class="hardware-item">
-              🔋 Power Supply<br />
-              <small>5V 3A → VIN & GND</small>
-            </div>
-          </div>
-
-          <div class="esp32-center">
-            <h3>ESP32</h3>
-            <p>DevKit</p>
-            <hr style="margin: 15px 0; opacity: 0.3" />
-            <small>
-              • Dual-Core 240MHz<br />
-              • Wi-Fi Module<br />
-              • 34 GPIO Pins<br />
-              • ADC & PWM
-            </small>
-          </div>
-
-          <div class="hardware-column">
-            <h3 style="color: #667eea; text-align: center; margin-bottom: 15px">
-              OUTPUT ACTUATORS
-            </h3>
-            <div class="hardware-item">
-              🔌 Relay Module<br />
-              <small>GPIO 5 → Digital Output</small>
-            </div>
-            <div class="hardware-item">
-              💦 Water Pump DC 5V<br />
-              <small>Via Relay → Irrigation</small>
-            </div>
-            <div class="hardware-item">
-              📶 MQTT Broker<br />
-              <small>Wi-Fi → Cloud Platform</small>
-            </div>
-            <div class="hardware-item">
-              🔔 Notification System<br />
-              <small>Push → Mobile/Web</small>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style="
-            margin-top: 40px;
-            padding: 25px;
-            background: #e3f2fd;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            border-left: 5px solid #2196f3;
-          "
-        >
-          <h4 style="color: #1976d2; margin-bottom: 10px">
-            📋 Pin Configuration:
-          </h4>
-          <div
-            style="
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-              gap: 15px;
-              color: #333;
-            "
-          >
-            <div><strong>DHT22:</strong> GPIO 4</div>
-            <div><strong>Soil Moisture:</strong> ADC 34</div>
-            <div><strong>LDR:</strong> ADC 35</div>
-            <div><strong>Relay/Pump:</strong> GPIO 5</div>
-            <div><strong>Power:</strong> VIN (5V), GND</div>
-            <div><strong>Wi-Fi:</strong> Built-in Module</div>
-          </div>
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .diagram-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .diagram-container.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .diagram-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .diagram-description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        /* Block Diagram Styles */
+        .block-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .block-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .block {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .block h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .block ul {
+            list-style: none;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+        
+        .block.controller {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-width: 250px;
+        }
+        
+        .block.platform {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #667eea;
+            margin: 0 auto;
+            opacity: 0.6;
+        }
+        
+        /* Flowchart Styles */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .flow-node {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 20px 30px;
+            border-radius: 10px;
+            min-width: 250px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .flow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .flow-node.start-end {
+            background: #667eea;
+            color: white;
+            border-radius: 50px;
+        }
+        
+        .flow-node.decision {
+            background: #fff5e6;
+            border-color: #ff9800;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            padding: 30px 40px;
+            min-width: 280px;
+        }
+        
+        .flow-node.process {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .flow-node.action {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .flow-branches {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+        
+        .flow-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .branch-label {
+            background: #ff9800;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .flow-connector {
+            width: 3px;
+            height: 25px;
+            background: #667eea;
+            margin: 0 auto;
+        }
+        
+        /* Use Case Diagram */
+        .usecase-diagram {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .actor {
+            text-align: center;
+        }
+        
+        .actor-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5em;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .actor-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.2em;
+        }
+        
+        .use-cases {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .use-case {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            padding: 15px 25px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 500;
+            color: #1976d2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .use-case:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+        }
+        
+        /* Architecture Diagram */
+        .architecture {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .tier {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tier-title {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .tier-content {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .tier-component {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 180px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tier-component h4 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .tier-component ul {
+            list-style: none;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+        
+        .tier-connector {
+            text-align: center;
+            color: #667eea;
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        /* Hardware Connection Diagram */
+        .hardware-diagram {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .hardware-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .hardware-item {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .hardware-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(132, 250, 176, 0.3);
+        }
+        
+        .esp32-center {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);
+            min-width: 200px;
+        }
+        
+        .esp32-center h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .connection-line {
+            width: 50px;
+            height: 3px;
+            background: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .usecase-diagram,
+            .hardware-diagram {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+            
+            .diagram-container {
+                padding: 20px;
+            }
+        }
+
+        /* 3D Greenhouse Styles */
+        .view-btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        .greenhouse-3d-container {
+            background: linear-gradient(180deg, #E3F2FD 0%, #FFFFFF 100%);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .greenhouse-3d-container svg {
+            transition: viewBox 0.5s ease;
+        }
+
+        .greenhouse-3d-container g {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        @media (max-width: 600px) {
+            .greenhouse-3d-container svg {
+                max-width: 100%;
+                height: auto;
+            }
+            .view-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 Smart Greenhouse IoT System</h1>
+            <p>Visualisasi Diagram & Flowchart Sistem</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showDiagram('block')">Diagram Blok</button>
+            <button class="tab-btn" onclick="showDiagram('flowchart')">Flowchart</button>
+            <button class="tab-btn" onclick="showDiagram('usecase')">Use Case</button>
+            <button class="tab-btn" onclick="showDiagram('architecture')">Arsitektur</button>
+            <button class="tab-btn" onclick="showDiagram('hardware')">Koneksi Hardware</button>
+            <button class="tab-btn" onclick="showDiagram('design3d')">Desain 3D</button>
         </div>
-      </div>
+        
+        <!-- Block Diagram -->
+        <div id="block" class="diagram-container active">
+            <h2 class="diagram-title">📊 Diagram Blok Sistem</h2>
+            <p class="diagram-description">
+                Diagram blok menunjukkan komponen utama sistem Smart Greenhouse dan hubungan antar komponen
+            </p>
+            
+            <div class="block-diagram">
+                <div class="block-row">
+                    <div class="block">
+                        <h3>📡 SENSORS</h3>
+                        <ul>
+                            <li>• DHT22 (Suhu & Kelembaban)</li>
+                            <li>• Soil Moisture Sensor</li>
+                            <li>• LDR (Light Sensor)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="arrow-down"></div>
+                
+                <div class="block-row">
+                    <div class="block controller">
+                        <h3>🎛️ MICROCONTROLLER</h3>
+                        <ul>
+                            <li>ESP32 DevKit</li>
+                            <li>• Data Processing</li>
+                            <li>• Control Logic</li>
+                            <li>• Wi-Fi Communication</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="arrow-down"></div>
+                
+                <div class="block-row">
+                    <div class="block platform">
+                        <h3>☁️ IoT PLATFORM</h3>
+                        <ul>
+                            <li>Blynk / ThingSpeak</li>
+                            <li>• MQTT Broker</li>
+                            <li>• Cloud Database</li>
+                            <li>• Real-time Dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="arrow-down"></div>
+                
+                <div class="block-row">
+                    <div class="block">
+                        <h3>💧 ACTUATORS</h3>
+                        <ul>
+                            <li>• Water Pump</li>
+                            <li>• Relay Module</li>
+                            <li>• Notification System</li>
+                        </ul>
+                    </div>
+                    <div class="block">
+                        <h3>📱 USER INTERFACE</h3>
+                        <ul>
+                            <li>• Mobile App</li>
+                            <li>• Web Dashboard</li>
+                            <li>• Manual Control</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flowchart -->
+        <div id="flowchart" class="diagram-container">
+            <h2 class="diagram-title">🔄 Flowchart Sistem Irigasi Otomatis</h2>
+            <p class="diagram-description">
+                Alur kerja sistem dalam memproses data sensor dan mengontrol irigasi
+            </p>
+            
+            <div class="flowchart">
+                <div class="flow-node start-end">START</div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node process">
+                    Inisialisasi Sistem<br>
+                    <small>Wi-Fi, Sensors, MQTT</small>
+                </div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node process">
+                    Baca Data Sensor<br>
+                    <small>Suhu, Kelembaban, Soil Moisture</small>
+                </div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node process">
+                    Kirim Data ke Cloud<br>
+                    <small>via MQTT/HTTP</small>
+                </div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node decision">
+                    Kelembaban Tanah<br>< 40% ?
+                </div>
+                
+                <div class="flow-branches">
+                    <div class="flow-branch">
+                        <span class="branch-label">YA</span>
+                        <div class="flow-node action">
+                            Aktifkan Pompa Air<br>
+                            <small>Status: Menyiram</small>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-branch">
+                        <span class="branch-label">TIDAK</span>
+                        <div class="flow-node decision">
+                            Kelembaban > 60% ?
+                        </div>
+                        <div class="flow-branches" style="margin-top: 15px;">
+                            <div class="flow-branch">
+                                <span class="branch-label" style="background: #4caf50;">YA</span>
+                                <div class="flow-node action">
+                                    Matikan Pompa<br>
+                                    <small>Status: Normal</small>
+                                </div>
+                            </div>
+                            <div class="flow-branch">
+                                <span class="branch-label" style="background: #9e9e9e;">TIDAK</span>
+                                <div class="flow-node process">
+                                    Pertahankan Status
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flow-connector" style="height: 50px;"></div>
+                
+                <div class="flow-node process">
+                    Update Dashboard & Notifikasi
+                </div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node process">
+                    Delay 5 Detik
+                </div>
+                <div class="flow-connector"></div>
+                
+                <div class="flow-node start-end">LOOP KEMBALI</div>
+            </div>
+        </div>
+        
+        <!-- Use Case Diagram -->
+        <div id="usecase" class="diagram-container">
+            <h2 class="diagram-title">👥 Use Case Diagram</h2>
+            <p class="diagram-description">
+                Interaksi antara pengguna (Petani) dan sistem Smart Greenhouse
+            </p>
+            
+            <div class="usecase-diagram">
+                <div class="actor">
+                    <div class="actor-icon">👨‍🌾</div>
+                    <div class="actor-name">PETANI<br>(User)</div>
+                </div>
+                
+                <div class="use-cases">
+                    <div class="use-case">📊 View Real-time Sensor Data</div>
+                    <div class="use-case">🌡️ Monitor Temperature & Humidity</div>
+                    <div class="use-case">💧 Check Soil Moisture Level</div>
+                    <div class="use-case">🎮 Control Irrigation Manually</div>
+                    <div class="use-case">⚙️ Set Threshold Values</div>
+                    <div class="use-case">📈 View Historical Data</div>
+                    <div class="use-case">🔔 Receive Alert Notifications</div>
+                    <div class="use-case">📥 Export Data (CSV/Excel)</div>
+                    <div class="use-case">🔧 Configure System Settings</div>
+                </div>
+                
+                <div class="actor">
+                    <div class="actor-icon">🤖</div>
+                    <div class="actor-name">SISTEM<br>(Automated)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Architecture Diagram -->
+        <div id="architecture" class="diagram-container">
+            <h2 class="diagram-title">🏗️ Arsitektur Sistem 3-Tier</h2>
+            <p class="diagram-description">
+                Arsitektur sistem terdiri dari 3 layer: Presentation, Application, dan Data Tier
+            </p>
+            
+            <div class="architecture">
+                <div class="tier">
+                    <div class="tier-title">📱 PRESENTATION TIER (User Interface)</div>
+                    <div class="tier-content">
+                        <div class="tier-component">
+                            <h4>Mobile App</h4>
+                            <ul>
+                                <li>• Real-time data</li>
+                                <li>• Quick control</li>
+                                <li>• Push notifications</li>
+                            </ul>
+                        </div>
+                        <div class="tier-component">
+                            <h4>Web Dashboard</h4>
+                            <ul>
+                                <li>• Data analytics</li>
+                                <li>• Export reports</li>
+                                <li>• Configuration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tier-connector">⬇️</div>
+                
+                <div class="tier">
+                    <div class="tier-title">☁️ APPLICATION TIER (Business Logic)</div>
+                    <div class="tier-content">
+                        <div class="tier-component">
+                            <h4>IoT Cloud Platform</h4>
+                            <ul>
+                                <li>• Data processing</li>
+                                <li>• Business rules</li>
+                                <li>• Alert management</li>
+                                <li>• Authentication</li>
+                            </ul>
+                        </div>
+                        <div class="tier-component">
+                            <h4>MQTT Broker</h4>
+                            <ul>
+                                <li>• Message queue</li>
+                                <li>• Pub/Sub protocol</li>
+                                <li>• QoS management</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tier-connector">⬇️</div>
+                
+                <div class="tier">
+                    <div class="tier-title">🔌 DATA TIER (IoT Devices)</div>
+                    <div class="tier-content">
+                        <div class="tier-component">
+                            <h4>ESP32 Controller</h4>
+                            <ul>
+                                <li>• Sensor data collection</li>
+                                <li>• Local control logic</li>
+                                <li>• Actuator management</li>
+                                <li>• Data buffering</li>
+                            </ul>
+                        </div>
+                        <div class="tier-component">
+                            <h4>Sensors</h4>
+                            <ul>
+                                <li>• DHT22</li>
+                                <li>• Soil Moisture</li>
+                                <li>• LDR Light</li>
+                            </ul>
+                        </div>
+                        <div class="tier-component">
+                            <h4>Actuators</h4>
+                            <ul>
+                                <li>• Water Pump</li>
+                                <li>• Relay Module</li>
+                                <li>• LED Indicators</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hardware Connection Diagram -->
+        <div id="hardware" class="diagram-container">
+            <h2 class="diagram-title">🔌 Diagram Koneksi Hardware</h2>
+            <p class="diagram-description">
+                Koneksi detail antara sensor, ESP32, dan aktuator dalam sistem Smart Greenhouse
+            </p>
+            
+            <div class="hardware-diagram">
+                <div class="hardware-column">
+                    <h3 style="color: #667eea; text-align: center; margin-bottom: 15px;">INPUT SENSORS</h3>
+                    <div class="hardware-item">
+                        📡 DHT22<br>
+                        <small>GPIO 4 → Temp & Humidity</small>
+                    </div>
+                    <div class="hardware-item">
+                        💧 Soil Moisture Sensor<br>
+                        <small>ADC 34 → Analog Input</small>
+                    </div>
+                    <div class="hardware-item">
+                        💡 LDR Light Sensor<br>
+                        <small>ADC 35 → Light Intensity</small>
+                    </div>
+                    <div class="hardware-item">
+                        🔋 Power Supply<br>
+                        <small>5V 3A → VIN & GND</small>
+                    </div>
+                </div>
+                
+                <div class="esp32-center">
+                    <h3>ESP32</h3>
+                    <p>DevKit</p>
+                    <hr style="margin: 15px 0; opacity: 0.3;">
+                    <small>
+                        • Dual-Core 240MHz<br>
+                        • Wi-Fi Module<br>
+                        • 34 GPIO Pins<br>
+                        • ADC & PWM
+                    </small>
+                </div>
+                
+                <div class="hardware-column">
+                    <h3 style="color: #667eea; text-align: center; margin-bottom: 15px;">OUTPUT ACTUATORS</h3>
+                    <div class="hardware-item">
+                        🔌 Relay Module<br>
+                        <small>GPIO 5 → Digital Output</small>
+                    </div>
+                    <div class="hardware-item">
+                        💦 Water Pump DC 5V<br>
+                        <small>Via Relay → Irrigation</small>
+                    </div>
+                    <div class="hardware-item">
+                        📶 MQTT Broker<br>
+                        <small>Wi-Fi → Cloud Platform</small>
+                    </div>
+                    <div class="hardware-item">
+                        🔔 Notification System<br>
+                        <small>Push → Mobile/Web</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px; padding: 25px; background: #e3f2fd; border-radius: 10px; border-left: 5px solid #2196f3;">
+                <h4 style="color: #1976d2; margin-bottom: 10px;">📋 Pin Configuration:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: #333;">
+                    <div><strong>DHT22:</strong> GPIO 4</div>
+                    <div><strong>Soil Moisture:</strong> ADC 34</div>
+                    <div><strong>LDR:</strong> ADC 35</div>
+                    <div><strong>Relay/Pump:</strong> GPIO 5</div>
+                    <div><strong>Power:</strong> VIN (5V), GND</div>
+                    <div><strong>Wi-Fi:</strong> Built-in Module</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 3D Greenhouse Design -->
+        <div id="design3d" class="diagram-container">
+            <h2 class="diagram-title">🏗️ Desain 3D Smart Greenhouse</h2>
+            <p class="diagram-description">
+                Visualisasi arsitektur fisik Smart Greenhouse dengan penempatan komponen IoT
+            </p>
+            
+            <!-- View Controls -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="view-btn" onclick="changeView('front')" aria-label="Tampilan Depan Greenhouse">🔲 Tampak Depan</button>
+                <button class="view-btn" onclick="changeView('side')" aria-label="Tampilan Samping Greenhouse">📐 Tampak Samping</button>
+                <button class="view-btn" onclick="changeView('top')" aria-label="Tampilan Atas Greenhouse">⬆️ Tampak Atas</button>
+                <button class="view-btn" onclick="changeView('iso')" aria-label="Tampilan Isometric Greenhouse">📦 Isometric</button>
+            </div>
+            
+            <div class="greenhouse-3d-container">
+                <svg id="greenhouse3d" viewBox="0 0 800 600" style="width: 100%; max-width: 800px; margin: 0 auto; display: block;">
+                    <!-- Background -->
+                    <defs>
+                        <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#A0826D;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:0.7" />
+                            <stop offset="100%" style="stop-color:#BBDEFB;stop-opacity:0.5" />
+                        </linearGradient>
+                        <pattern id="plantPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <circle cx="20" cy="20" r="15" fill="#4CAF50" opacity="0.6"/>
+                            <circle cx="20" cy="20" r="8" fill="#66BB6A" opacity="0.8"/>
+                        </pattern>
+                    </defs>
+                    
+                    <!-- Sky Background -->
+                    <rect x="0" y="0" width="800" height="400" fill="url(#skyGrad)"/>
+                    
+                    <!-- Ground -->
+                    <rect x="0" y="400" width="800" height="200" fill="url(#groundGrad)"/>
+                    
+                    <!-- Sun -->
+                    <circle cx="700" cy="80" r="40" fill="#FFD700" opacity="0.8">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    
+                    <!-- Greenhouse Structure - Isometric View -->
+                    <g id="greenhouseStructure">
+                        <!-- Base/Foundation -->
+                        <rect x="200" y="380" width="400" height="20" fill="#654321" stroke="#4A3319" stroke-width="2"/>
+                        
+                        <!-- Back Wall -->
+                        <polygon points="220,380 580,380 550,200 250,200" fill="#E8F5E9" stroke="#4CAF50" stroke-width="3" opacity="0.3"/>
+                        
+                        <!-- Left Wall (Glass) -->
+                        <polygon points="200,400 220,380 250,200 230,220" fill="url(#glassGrad)" stroke="#2196F3" stroke-width="2"/>
+                        
+                        <!-- Right Wall (Glass) -->
+                        <polygon points="600,400 580,380 550,200 570,220" fill="url(#glassGrad)" stroke="#2196F3" stroke-width="2"/>
+                        
+                        <!-- Front Wall (Glass) -->
+                        <polygon points="230,220 570,220 600,400 200,400" fill="url(#glassGrad)" stroke="#2196F3" stroke-width="3"/>
+                        
+                        <!-- Roof (Transparent) -->
+                        <polygon points="250,200 550,200 570,220 230,220" fill="#B3E5FC" stroke="#0277BD" stroke-width="2" opacity="0.4"/>
+                        
+                        <!-- Roof Frame -->
+                        <line x1="250" y1="200" x2="400" y2="150" stroke="#666" stroke-width="3"/>
+                        <line x1="550" y1="200" x2="400" y2="150" stroke="#666" stroke-width="3"/>
+                        <line x1="230" y1="220" x2="400" y2="170" stroke="#666" stroke-width="3"/>
+                        <line x1="570" y1="220" x2="400" y2="170" stroke="#666" stroke-width="3"/>
+                        
+                        <!-- Vertical Frame Supports -->
+                        <line x1="220" y1="380" x2="250" y2="200" stroke="#555" stroke-width="4"/>
+                        <line x1="580" y1="380" x2="550" y2="200" stroke="#555" stroke-width="4"/>
+                        <line x1="200" y1="400" x2="230" y2="220" stroke="#555" stroke-width="4"/>
+                        <line x1="600" y1="400" x2="570" y2="220" stroke="#555" stroke-width="4"/>
+                        
+                        <!-- Door Frame -->
+                        <rect x="360" y="300" width="80" height="100" fill="#8B4513" stroke="#654321" stroke-width="2" rx="5"/>
+                        <circle cx="420" cy="350" r="3" fill="#FFD700"/>
+                        <line x1="400" y1="300" x2="400" y2="400" stroke="#654321" stroke-width="1"/>
+                    </g>
+                    
+                    <!-- Interior Elements -->
+                    <g id="interiorElements">
+                        <!-- Growing Benches/Tables -->
+                        <g opacity="0.8">
+                            <!-- Left Bench -->
+                            <rect x="240" y="320" width="120" height="50" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                            <rect x="240" y="310" width="120" height="10" fill="#A0826D"/>
+                            <!-- Plants on left bench -->
+                            <rect x="245" y="295" width="110" height="15" fill="url(#plantPattern)"/>
+                            
+                            <!-- Right Bench -->
+                            <rect x="440" y="320" width="120" height="50" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                            <rect x="440" y="310" width="120" height="10" fill="#A0826D"/>
+                            <!-- Plants on right bench -->
+                            <rect x="445" y="295" width="110" height="15" fill="url(#plantPattern)"/>
+                        </g>
+                        
+                        <!-- Water Container -->
+                        <g>
+                            <rect x="520" y="360" width="50" height="35" fill="#4FC3F7" stroke="#0277BD" stroke-width="2" rx="3"/>
+                            <rect x="520" y="355" width="50" height="5" fill="#0288D1"/>
+                            <text x="545" y="380" text-anchor="middle" font-size="10" fill="white" font-weight="bold">H₂O</text>
+                        </g>
+                    </g>
+                    
+                    <!-- IoT Components -->
+                    <g id="iotComponents">
+                        <!-- ESP32 Controller Box (on wall) -->
+                        <g>
+                            <rect x="500" y="250" width="60" height="40" fill="#667EEA" stroke="#4C51BF" stroke-width="2" rx="5"/>
+                            <text x="530" y="265" text-anchor="middle" font-size="9" fill="white" font-weight="bold">ESP32</text>
+                            <text x="530" y="278" text-anchor="middle" font-size="8" fill="white">Controller</text>
+                            <circle cx="515" cy="285" r="2" fill="#4CAF50"/>
+                            <circle cx="525" cy="285" r="2" fill="#FFC107"/>
+                            <circle cx="535" cy="285" r="2" fill="#F44336"/>
+                        </g>
+                        
+                        <!-- DHT22 Sensor (ceiling mounted) -->
+                        <g>
+                            <rect x="300" y="230" width="30" height="20" fill="#FF9800" stroke="#F57C00" stroke-width="1" rx="3"/>
+                            <text x="315" y="243" text-anchor="middle" font-size="7" fill="white" font-weight="bold">DHT22</text>
+                            <line x1="315" y1="250" x2="315" y2="260" stroke="#666" stroke-width="1" stroke-dasharray="2,2"/>
+                            <circle cx="315" cy="262" r="8" fill="none" stroke="#FF9800" stroke-width="1" opacity="0.5">
+                                <animate attributeName="r" values="8;15;8" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </g>
+                        
+                        <!-- Soil Moisture Sensors (in plants) -->
+                        <g>
+                            <rect x="270" y="300" width="15" height="25" fill="#4CAF50" stroke="#2E7D32" stroke-width="1" rx="2"/>
+                            <line x1="277" y1="300" x2="277" y2="290" stroke="#666" stroke-width="1"/>
+                            <circle cx="277" cy="288" r="3" fill="#2196F3"/>
+                            <text x="277" y="340" text-anchor="middle" font-size="7" fill="#333">Soil 1</text>
+                            
+                            <rect x="515" y="300" width="15" height="25" fill="#4CAF50" stroke="#2E7D32" stroke-width="1" rx="2"/>
+                            <line x1="522" y1="300" x2="522" y2="290" stroke="#666" stroke-width="1"/>
+                            <circle cx="522" cy="288" r="3" fill="#2196F3"/>
+                            <text x="522" y="340" text-anchor="middle" font-size="7" fill="#333">Soil 2</text>
+                        </g>
+                        
+                        <!-- LDR Light Sensor (on roof) -->
+                        <g>
+                            <circle cx="400" cy="180" r="10" fill="#FFC107" stroke="#FF8F00" stroke-width="2"/>
+                            <circle cx="400" cy="180" r="5" fill="#FFD54F"/>
+                            <line x1="400" y1="170" x2="400" y2="165" stroke="#FF8F00" stroke-width="2"/>
+                            <line x1="390" y1="180" x2="385" y2="180" stroke="#FF8F00" stroke-width="2"/>
+                            <line x1="410" y1="180" x2="415" y2="180" stroke="#FF8F00" stroke-width="2"/>
+                            <text x="400" y="200" text-anchor="middle" font-size="7" fill="#333">LDR</text>
+                        </g>
+                        
+                        <!-- Water Pump -->
+                        <g>
+                            <circle cx="545" cy="340" r="12" fill="#0288D1" stroke="#01579B" stroke-width="2"/>
+                            <path d="M 540,340 L 545,335 L 550,340 L 545,345 Z" fill="white"/>
+                            <text x="545" y="330" text-anchor="middle" font-size="7" fill="#333">Pump</text>
+                        </g>
+                        
+                        <!-- Irrigation Pipes -->
+                        <g stroke="#0277BD" stroke-width="2" fill="none" opacity="0.7">
+                            <path d="M 545,352 Q 545,330 270,310" stroke-dasharray="5,3"/>
+                            <path d="M 545,352 Q 545,330 520,310" stroke-dasharray="5,3"/>
+                            <circle cx="270" cy="310" r="3" fill="#4FC3F7"/>
+                            <circle cx="520" cy="310" r="3" fill="#4FC3F7"/>
+                        </g>
+                        
+                        <!-- WiFi Signal -->
+                        <g>
+                            <path d="M 520,245 Q 530,235 540,245" stroke="#667EEA" stroke-width="2" fill="none" opacity="0.6">
+                                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M 515,240 Q 530,225 545,240" stroke="#667EEA" stroke-width="2" fill="none" opacity="0.4">
+                                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                            </path>
+                            <path d="M 510,235 Q 530,215 550,235" stroke="#667EEA" stroke-width="2" fill="none" opacity="0.2">
+                                <animate attributeName="opacity" values="0.1;0.4;0.1" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+                            </path>
+                        </g>
+                    </g>
+                    
+                    <!-- Labels and Annotations -->
+                    <g id="annotations" font-family="Arial" font-size="11">
+                        <!-- Dimensions -->
+                        <g stroke="#333" stroke-width="1" fill="none">
+                            <line x1="200" y1="420" x2="600" y2="420" marker-start="url(#arrowStart)" marker-end="url(#arrowEnd)"/>
+                            <text x="400" y="440" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">2.0 m (Width)</text>
+                            
+                            <line x1="180" y1="400" x2="180" y2="220" marker-start="url(#arrowStart)" marker-end="url(#arrowEnd)"/>
+                            <text x="160" y="310" text-anchor="middle" font-size="12" fill="#333" font-weight="bold" transform="rotate(-90 160 310)">1.8 m</text>
+                        </g>
+                        
+                        <defs>
+                            <marker id="arrowStart" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                <polygon points="5,0 10,5 5,10" fill="#333"/>
+                            </marker>
+                            <marker id="arrowEnd" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                <polygon points="0,5 5,0 5,10" fill="#333"/>
+                            </marker>
+                        </defs>
+                    </g>
+                    
+                    <!-- Legend -->
+                    <g id="legend" transform="translate(20, 450)">
+                        <rect x="0" y="0" width="250" height="140" fill="white" stroke="#667EEA" stroke-width="2" rx="5" opacity="0.95"/>
+                        <text x="125" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#667EEA">Komponen IoT</text>
+                        
+                        <circle cx="15" cy="40" r="5" fill="#667EEA"/>
+                        <text x="30" y="45" font-size="10" fill="#333">ESP32 Controller</text>
+                        
+                        <circle cx="15" cy="60" r="5" fill="#FF9800"/>
+                        <text x="30" y="65" font-size="10" fill="#333">DHT22 (Temp/Humidity)</text>
+                        
+                        <circle cx="15" cy="80" r="5" fill="#4CAF50"/>
+                        <text x="30" y="85" font-size="10" fill="#333">Soil Moisture Sensor</text>
+                        
+                        <circle cx="15" cy="100" r="5" fill="#FFC107"/>
+                        <text x="30" y="105" font-size="10" fill="#333">LDR Light Sensor</text>
+                        
+                        <circle cx="15" cy="120" r="5" fill="#0288D1"/>
+                        <text x="30" y="125" font-size="10" fill="#333">Water Pump</text>
+                    </g>
+                    
+                    <!-- Title -->
+                    <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#667EEA">
+                        Smart Greenhouse - Isometric View
+                    </text>
+                    <text x="400" y="50" text-anchor="middle" font-size="12" fill="#666">
+                        Dimensi: 2.0m × 2.0m × 2.0m | Skala: Prototype
+                    </text>
+                </svg>
+            </div>
+            
+            <!-- Technical Specifications -->
+            <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #E3F2FD; padding: 20px; border-radius: 10px; border-left: 4px solid #2196F3;">
+                    <h4 style="color: #1976D2; margin-bottom: 10px;">📐 Spesifikasi Struktur</h4>
+                    <ul style="list-style: none; line-height: 1.8; color: #333;">
+                        <li>✓ Dimensi: 2m × 2m × 2m</li>
+                        <li>✓ Material: Rangka PVC 3/4"</li>
+                        <li>✓ Penutup: UV Plastic 2mm</li>
+                        <li>✓ Pintu: 80cm × 100cm</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #F3E5F5; padding: 20px; border-radius: 10px; border-left: 4px solid #9C27B0;">
+                    <h4 style="color: #7B1FA2; margin-bottom: 10px;">🔌 Komponen Elektronik</h4>
+                    <ul style="list-style: none; line-height: 1.8; color: #333;">
+                        <li>✓ ESP32 DevKit (1 unit)</li>
+                        <li>✓ DHT22 Sensor (1 unit)</li>
+                        <li>✓ Soil Moisture (2 unit)</li>
+                        <li>✓ LDR Sensor (1 unit)</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #E8F5E9; padding: 20px; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                    <h4 style="color: #2E7D32; margin-bottom: 10px;">🌱 Kapasitas Tanaman</h4>
+                    <ul style="list-style: none; line-height: 1.8; color: #333;">
+                        <li>✓ 2 Meja Tanam (120cm)</li>
+                        <li>✓ Kapasitas: 8-12 pot</li>
+                        <li>✓ Jarak Antar Pot: 20cm</li>
+                        <li>✓ Tanaman: Sayuran Daun</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #FFF3E0; padding: 20px; border-radius: 10px; border-left: 4px solid #FF9800;">
+                    <h4 style="color: #E65100; margin-bottom: 10px;">💧 Sistem Irigasi</h4>
+                    <ul style="list-style: none; line-height: 1.8; color: #333;">
+                        <li>✓ Pompa DC 5V (120L/H)</li>
+                        <li>✓ Reservoir: 5 Liter</li>
+                        <li>✓ Pipa: Diameter 6mm</li>
+                        <li>✓ Mode: Auto/Manual</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Floor Plan View -->
+            <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <h3 style="color: #667EEA; text-align: center; margin-bottom: 20px;">📋 Denah Tampak Atas (Floor Plan)</h3>
+                <svg viewBox="0 0 600 600" style="width: 100%; max-width: 500px; margin: 0 auto; display: block;">
+                    <!-- Outer walls -->
+                    <rect x="50" y="50" width="500" height="500" fill="#E8F5E9" stroke="#4CAF50" stroke-width="4" rx="5"/>
+                    
+                    <!-- Door -->
+                    <rect x="270" y="50" width="60" height="10" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                    <text x="300" y="35" text-anchor="middle" font-size="12" fill="#333">Pintu</text>
+                    
+                    <!-- Left Growing Bench -->
+                    <rect x="80" y="100" width="200" height="80" fill="#A0826D" stroke="#654321" stroke-width="2"/>
+                    <text x="180" y="145" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Meja Tanam 1</text>
+                    <!-- Plants on left bench -->
+                    <circle cx="120" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="170" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="220" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="120" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="170" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="220" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    
+                    <!-- Right Growing Bench -->
+                    <rect x="320" y="100" width="200" height="80" fill="#A0826D" stroke="#654321" stroke-width="2"/>
+                    <text x="420" y="145" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Meja Tanam 2</text>
+                    <!-- Plants on right bench -->
+                    <circle cx="360" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="410" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="460" cy="120" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="360" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="410" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    <circle cx="460" cy="160" r="15" fill="#4CAF50" opacity="0.7"/>
+                    
+                    <!-- Water Container -->
+                    <rect x="450" y="450" width="80" height="80" fill="#4FC3F7" stroke="#0277BD" stroke-width="3" rx="5"/>
+                    <text x="490" y="495" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Water</text>
+                    <text x="490" y="510" text-anchor="middle" font-size="12" fill="white">Tank 5L</text>
+                    
+                    <!-- ESP32 Controller -->
+                    <rect x="80" y="450" width="100" height="60" fill="#667EEA" stroke="#4C51BF" stroke-width="3" rx="5"/>
+                    <text x="130" y="475" text-anchor="middle" font-size="12" fill="white" font-weight="bold">ESP32</text>
+                    <text x="130" y="495" text-anchor="middle" font-size="10" fill="white">Controller</text>
+                    
+                    <!-- Sensors positions -->
+                    <circle cx="180" cy="280" r="20" fill="#FF9800" stroke="#F57C00" stroke-width="2"/>
+                    <text x="180" y="285" text-anchor="middle" font-size="10" fill="white" font-weight="bold">DHT22</text>
+                    
+                    <circle cx="120" cy="130" r="8" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+                    <text x="120" y="210" text-anchor="middle" font-size="9" fill="#333">Soil 1</text>
+                    
+                    <circle cx="420" cy="130" r="8" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+                    <text x="420" y="210" text-anchor="middle" font-size="9" fill="#333">Soil 2</text>
+                    
+                    <circle cx="420" cy="280" r="15" fill="#FFC107" stroke="#FF8F00" stroke-width="2"/>
+                    <text x="420" y="285" text-anchor="middle" font-size="9" fill="white" font-weight="bold">LDR</text>
+                    
+                    <!-- Connection lines -->
+                    <line x1="130" y1="450" x2="180" y2="300" stroke="#667EEA" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    <line x1="130" y1="450" x2="120" y2="138" stroke="#667EEA" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    <line x1="130" y1="450" x2="420" y2="138" stroke="#667EEA" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    <line x1="130" y1="450" x2="420" y2="295" stroke="#667EEA" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    <line x1="450" y1="490" x2="120" y2="175" stroke="#0277BD" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    <line x1="450" y1="490" x2="420" y2="175" stroke="#0277BD" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+                    
+                    <!-- Dimensions -->
+                    <line x1="50" y1="570" x2="550" y2="570" stroke="#333" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                    <text x="300" y="590" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">2000 mm</text>
+                    
+                    <line x1="570" y1="50" x2="570" y2="550" stroke="#333" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                    <text x="585" y="300" text-anchor="middle" font-size="14" fill="#333" font-weight="bold" transform="rotate(90 585 300)">2000 mm</text>
+                    
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
     </div>
-
+    
     <script>
-      function showDiagram(diagramId) {
-        // Hide all diagrams
-        const diagrams = document.querySelectorAll(".diagram-container");
-        diagrams.forEach((diagram) => {
-          diagram.classList.remove("active");
+        function showDiagram(diagramId) {
+            // Hide all diagrams
+            const diagrams = document.querySelectorAll('.diagram-container');
+            diagrams.forEach(diagram => {
+                diagram.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected diagram
+            document.getElementById(diagramId).classList.add('active');
+            
+            // Add active class to clicked tab
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+        
+        // Add hover effect to use cases
+        document.querySelectorAll('.use-case').forEach(usecase => {
+            usecase.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'translateX(10px)';
+                }, 200);
+            });
         });
 
-        // Remove active class from all tabs
-        const tabs = document.querySelectorAll(".tab-btn");
-        tabs.forEach((tab) => {
-          tab.classList.remove("active");
-        });
+        // Function to change the 3D view of the greenhouse
+        function changeView(view) {
+            const svg = document.getElementById('greenhouse3d');
+            const greenhouseStructure = document.getElementById('greenhouseStructure');
+            const interiorElements = document.getElementById('interiorElements');
+            const annotations = document.getElementById('annotations');
+            const title = svg.querySelector('text[font-size="20"]');
 
-        // Show selected diagram
-        document.getElementById(diagramId).classList.add("active");
+            // Reset transform and opacity
+            greenhouseStructure.setAttribute('transform', '');
+            interiorElements.setAttribute('transform', '');
+            annotations.setAttribute('opacity', '1');
 
-        // Add active class to clicked tab
-        event.target.classList.add("active");
-      }
+            // Define transformations for each view
+            switch (view) {
+                case 'front':
+                    svg.setAttribute('viewBox', '100 200 600 400');
+                    greenhouseStructure.setAttribute('transform', 'translate(0, 0) scale(1.2)');
+                    interiorElements.setAttribute('opacity', '0.5');
+                    annotations.setAttribute('opacity', '0.7');
+                    title.textContent = 'Smart Greenhouse - Front View';
+                    break;
+                case 'side':
+                    svg.setAttribute('viewBox', '150 150 600 400');
+                    greenhouseStructure.setAttribute('transform', 'rotate(90 400 300) scale(1.1)');
+                    interiorElements.setAttribute('opacity', '0.6');
+                    title.textContent = 'Smart Greenhouse - Side View';
+                    break;
+                case 'top':
+                    svg.setAttribute('viewBox', '100 100 600 400');
+                    greenhouseStructure.setAttribute('transform', 'translate(0, -100) scale(1.3)');
+                    interiorElements.setAttribute('opacity', '0.8');
+                    title.textContent = 'Smart Greenhouse - Top View';
+                    break;
+                case 'iso':
+                default:
+                    svg.setAttribute('viewBox', '0 0 800 600');
+                    greenhouseStructure.setAttribute('transform', 'translate(0, 0) scale(1)');
+                    interiorElements.setAttribute('opacity', '1');
+                    title.textContent = 'Smart Greenhouse - Isometric View';
+                    break;
+            }
 
-      // Add hover effect to use cases
-      document.querySelectorAll(".use-case").forEach((usecase) => {
-        usecase.addEventListener("click", function () {
-          this.style.transform = "scale(1.1)";
-          setTimeout(() => {
-            this.style.transform = "translateX(10px)";
-          }, 200);
-        });
-      });
+            // Add smooth transition for SVG changes
+            greenhouseStructure.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+            interiorElements.style.transition = 'opacity 0.5s ease';
+            svg.style.transition = 'viewBox 0.5s ease';
+        }
     </script>
-  </body>
+</body>
 </html>
